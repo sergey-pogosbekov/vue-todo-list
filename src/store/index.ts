@@ -30,12 +30,6 @@ export default createStore<TodoState>({
     },
 
     updateTodo(state: any, { item: todoObj, newTextVal: newText } : any) {
-      // const editedTodo = ref(
-      //   state.todos.filter((todo: any) => todo.index === todoObj.index)[0]
-      // );
-
-      // let todoFromState = state.todos[state.todos.indexOf(todoObj)];
-      // todoFromState = { ... todoObj, text: newText };
       todoObj.text = newText;
     }
   },

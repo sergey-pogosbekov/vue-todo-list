@@ -2,9 +2,8 @@
   <li>
     <span>{{ currentTodoText }}</span>
       <button @click="alertVisible = true">Open Edit</button>
-      <Alert v-if="alertVisible" :modal="alertVisible" :title="currentTodoText" @close="alertVisible = false; currentTodoText = $event">
+      <Alert v-if="alertVisible" :modal="alertVisible" :title="currentTodoText" @close="alertVisible = false; $emit('update', $event); updateTodoTitle($event);">
       </Alert>
-      <!-- <alert :modal="alertVisible"></alert> -->
     <button @click.prevent="$emit('remove', todo)">Remove</button>
   </li>
 </template>
@@ -12,6 +11,7 @@
 <script>
 import Alert from './Alert.vue';
 import { ref } from 'vue';
+import store from '../store';
 
 export default {
   components: [ Alert ],
@@ -23,12 +23,19 @@ export default {
     }
   },
   setup(prop) {
-    let vis = ref(false);
-    let currentTodoText =  ref(prop.todo.text);
-     return {
-        alertVisible: vis,
-        currentTodoText
-      };
+    const
+      alertVisible = ref(false),
+      currentTodoText =  ref(prop.todo.text);
+
+    const updateTodoTitle = (newTitle) => {
+      currentTodoText.value = newTitle;
+    }
+
+    return {
+          alertVisible,
+          currentTodoText,
+          updateTodoTitle
+    };
   }
 }
 </script>

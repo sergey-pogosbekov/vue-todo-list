@@ -1,76 +1,81 @@
 <template>
-<!--<template>
-  <div class="about">
-    <h1>This is an about page</h1>
-  </div>
-</template>-->
   <div class="wrapper">
     <h1>My Todo List</h1>
     <form @submit.prevent="addTodo">
       <input type="text" name="todo-text" v-model="newText" placeholder="New todo">
     </form>
     <ul v-if="todos.length">
-      <TodoItem v-for="todo in todos" :key="todo.id" :todo="todo" @remove="removeTodo"/>
+      <TodoItem v-for="(todo, index) in todos" :key="index" :todo="todo" @remove="removeTodo" @update="updateTodo(todo, $event)" />
     </ul>
     <p class="none" v-else>Nothing left in the list. Add a new todo in the input above.</p>
   </div>
 
-  <!--modal template -->
 </template>
 
 <script>
 import TodoItem from "./TodoItem.vue"
-import { ref, watch, defineComponent } from 'vue';
+import { ref, defineComponent } from 'vue';
+import store from '../store';
 
 export default {
-  // name: 'About',
   components: {
     TodoItem
   },
 
   setup() {
       //init
-      let nextTodoId = 1;
-
-      const createTodo = text => ({
+      let intCounter = 0;
+      const newText = ref(""),
+      createTodo = text => ({
         text,
-        id: nextTodoId++
+        index: intCounter++
       });
+    
+    let initData = [];
 
-      const todos =  ref([
-      ]);
-
-      const initData = [
+    if( ! (store.state.todos && store.state.todos.length > 0) ) {
+        
+      initData = [
         createTodo("Learn Vue"),
         createTodo("Learn about single-file components"),
         createTodo("Fall in love ❤️")];
 
         initData.forEach(element => {
-          todos.value.push(element);
+          store.commit('addTodo', element);
         });
+      }
 
-      let newText = ref("");
-      //watch(todos)
-      return {
-        //properties
-        todos,
-        newText: newText,
-        //functions
-        addTodo: function() {
-          let textVar = newText.value;
-          const trimmedText = textVar.trim()
+      const
+        addTodo = () => {
+          const trimmedText =  newText.value.trim()
 
           if (trimmedText) {
-            todos.value.push(createTodo(trimmedText))
+            store.commit('addTodo', createTodo(trimmedText));
           }
 
-          newText.value = ""
+          newText.value = "";
         },
 
-        removeTodo: function(item) {
-          todos.value = todos.value.filter(todo => todo !== item)
-        }
-    }
+        removeTodo = item => {
+          store.commit('removeTodo', item);
+        },
+        
+        updateTodo = (item, newTextVal) => {
+          store.commit('updateTodo', { item, newTextVal } )
+        };
+
+   const  todos = ref(store.state.todos);
+      
+    return {
+      //properties
+      todos,
+      newText,
+      //functions
+      addTodo,
+      removeTodo,
+      updateTodo
+    };
+
   }
 }
 </script>
